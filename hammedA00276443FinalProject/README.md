@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to my Data Science Portfolio web site repo</h1>
+<h1 align="center">Welcome to the repo for my unofficial portfolio website!</h1>
 
 <p align="center">
   <a href="https://skillicons.dev">
@@ -13,9 +13,5 @@ This repository contains the source code for my personal portfolio website. Feel
 <h1 align="center">Technologies Used:</h1>
 
 
-**HTML, CSS, and JavaScript**: I used HTML, CSS, and JavaScript to create a responsive and website. This ensures a seamless user experience across various devices and screen sizes.
-
-**Flask**: I chose Flask, to develop the back end of my website. This allows me to serve my projects and easily integrate any data analysis or machine learning components in the future and collect data from inquiries.
-
-**Django**: Django version of this website is under development
-
+For a responsive website, I used **HTML, CSS, and JavaScript**.
+**Flask**: I chose Flask, to develop the back end of my website.
