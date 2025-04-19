@@ -6,7 +6,5 @@
   </a>
 </p>
  
-🔗 [Website](https://andriig.pythonanywhere.com/index.html)
-
 This repository contains the source code for my personal portfolio website.
 
