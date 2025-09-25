@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environments
+.env
+.env.*
+venv/
+.venv/
+*/venv/
+*/.venv/
+
+# Databases & state
+*.db
+*.sqlite
+*.sqlite3
+hammedA00276443FinalProject/portfolio.db
+
+# OS files
+.DS_Store
+
+# Byte-compiled / cache
+*.egg-info/
+
+# Node (in case of future tooling)
+node_modules/
