@@ -1,5 +1,5 @@
 import csv
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -61,6 +61,32 @@ class BlogPost(db.Model):
     title = db.Column(db.String(150), nullable=False)
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+# One-time admin creation route (remove after use)
+@app.route('/create_admin', methods=['GET', 'POST'])
+def create_admin():
+    if User.query.first():
+        return "Admin already exists. Remove or comment out this route for security.", 403
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if not username or not password:
+            return "Username and password required.", 400
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect('/login')
+    return '''
+        <h2>Create Admin User</h2>
+        <form method="POST">
+            <label>Username:</label><br>
+            <input type="text" name="username" required><br>
+            <label>Password:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Create Admin</button>
+        </form>
+    '''
 
 @app.route("/")
 def hello_world():
