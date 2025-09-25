@@ -87,7 +87,7 @@ Note: Keep projects static. These models exist or may exist for admin and messag
 ## Routes (current/expected)
 - GET `/` → render `index.html`
 - GET `/<page_name>` → render static template by name
-- POST `/submited_form` → handle contact form submission
+- POST `/submitted_form` → handle contact form submission
 - GET/POST `/login` → admin login
 - GET `/logout` → admin logout
 - GET `/admin` → admin dashboard (protected)
