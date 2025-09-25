@@ -71,7 +71,7 @@ Note: Keep projects static. These models exist or may exist for admin and messag
   "user_name": "string",
   "email": "string",
   "subject": "string",
-  "text": "string",
+  "message": "string",
   "timestamp": "ISO-8601"
 }
 ```
