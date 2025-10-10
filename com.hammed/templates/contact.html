@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+        <!-- Contact Section -->
+        <section class="container contact" id = "contact">
+          <div class="contact_text">
+            <h2 class="heading">Contact <span style="color:#FFDD00">Hammed</span></h2>
+            <h4>Let's work together</h4>
+            <p>I’m eager to apply my skills and contribute to real-world projects</p>
+            <div class="contact_list">
+              <li><a href=""></a><span style="color:#0057B7">Based in:</span> Canada</li>
+              <li><a href=""></a><span style="color:#FFDD00">Emai:</span> lawalolatunde14@gmail</li>
+            </div>
+            <div class="contact_social_icons">
+              <a href="https://www.linkedin.com/in/hammed-tunde-lawal-b32442258/" target="_blank" ><i class=" fab fa-linkedin " aria-hidden="true"></i></a>
+              <a href="mailto:lawalolatunde14@gmail.com" target="_blank" ><i class=" fa-regular fa-envelope" aria-hidden="true"></i></a>
+              <a href="https://github.com/Lawaltunde" target="_blank" ><i class=" fab fa-github " aria-hidden="true"></i></a>
+            </div>
+          </div>
+          <div class="contact_form">
+            <form action="{{ url_for('submited_form') }}" method="post">
+              <input name="user_name" type="text" placeholder="Your Name" required>
+              <input name="email" type="email" placeholder="Your Email Address" required>
+              <input name="subject" type="text" placeholder="Please specify Subject" required>
+              <textarea name="text" id="" cols="30" rows="10" placeholder="Type your message" required></textarea>
+              <input type="submit" value="Submit" class="send">
+            </form>
+          </div>
+        </section>
+{% endblock %}

@@ -79,7 +79,7 @@ function opentab(tabname){
 /*------------------------------------- Typed JS -------------------------------------*/
 
 const typed = new Typed('.multiple_text', {
-    strings: ['Software Engineer', 'Data Analyst', 'Python Developer', 'Java Developer'],
+    strings: ['Software Engineer', 'Full Stack Developer'],
     typeSpeed: 100,
     backSpeed: 100,
     backDelay: 1000,
