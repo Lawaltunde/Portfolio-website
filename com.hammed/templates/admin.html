@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container">
-        <h2>Admin Dashboard</h2>
-        <form action="{{ url_for('logout') }}" method="post" style="display:inline;">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="linklike" style="background:none;border:none;padding:0;color:#06c;text-decoration:underline;cursor:pointer;">Logout</button>
-        </form>
-        <h3>Contact Messages</h3>
-        {% if messages %}
-            <table border="1" cellpadding="8" cellspacing="0">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+<div class="admin-container">
+    <h2>Admin Dashboard</h2>
+    <form action="{{ url_for('logout') }}" method="post" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="linklike">Logout</button>
+    </form>
+    <h3>Contact Messages</h3>
+    {% if messages %}
+        <table class="admin-table">
+            <thead>
                 <tr>
                     <th>Name</th>
                     <th>Email</th>
@@ -17,6 +19,8 @@
                     <th>Message</th>
                     <th>Timestamp</th>
                 </tr>
+            </thead>
+            <tbody>
                 {% for msg in messages %}
                 <tr>
                     <td>{{ msg.user_name }}</td>
@@ -26,9 +30,10 @@
                     <td>{{ msg.timestamp }}</td>
                 </tr>
                 {% endfor %}
-            </table>
-        {% else %}
-            <p>No messages found.</p>
-        {% endif %}
-    </div>
+            </tbody>
+        </table>
+    {% else %}
+        <p>No messages found.</p>
+    {% endif %}
+</div>
 {% endblock %}

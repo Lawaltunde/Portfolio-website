@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='about.css') }}">
              <!-- About me Section -->
              <section class="container about" id="about">
                 <!-- Image me Section -->
@@ -21,12 +22,72 @@
                     </div>
                     <!-- Skills Navigation -->
                     <div class="tab_content active_tab" id="skills">
-                        <ul>
-                            <li><span>Software engineering</span><br>-> Full-Stack Development: Python (Django, Flask), Java (Spring Boot), React, JavaScript/TypeScript, HTML/CSS<br>
-                                -> Microservices & DevOps: Docker, Kubernetes, Git, CI/CD pipelines, cloud-ready architectures<br>
-                                -> Database Design & Management: PostgreSQL, MySQL, MongoDB, query optimization, scalable modeling<br>
-                                -> AI-Ehanced Solutions: Intelligent integrations and scalable application features</li>
-                        </ul>
+                        <div class="skills-container">
+                            <div class="skill-category">
+                                <h3><i class="fas fa-code"></i> Backend Development</h3>
+                                <div class="skill-item">
+                                    <p>Python</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 90%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>Flask</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>Django</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 80%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>Node.js</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 75%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="skill-category">
+                                <h3><i class="fas fa-desktop"></i> Frontend Development</h3>
+                                <div class="skill-item">
+                                    <p>HTML/CSS</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 95%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>JavaScript</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>React</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 80%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="skill-category">
+                                <h3><i class="fas fa-database"></i> Databases</h3>
+                                <div class="skill-item">
+                                    <p>MySQL</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 90%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>PostgreSQL</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>MongoDB</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 75%;"></div></div>
+                                </div>
+                            </div>
+                            <div class="skill-category">
+                                <h3><i class="fas fa-server"></i> DevOps</h3>
+                                <div class="skill-item">
+                                    <p>Docker</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 80%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>Git</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 90%;"></div></div>
+                                </div>
+                                <div class="skill-item">
+                                    <p>Jenkins</p>
+                                    <div class="progress-bar"><div class="progress" style="width: 70%;"></div></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- Technologies Navigation -->
                     <div class="tab_content" id="technologies">
@@ -47,20 +108,47 @@
                     </div>
                     <!-- Experience Navigation -->
                     <div class="tab_content" id="experience">
-                        <ul>
-                            <li><span>April 2025 - August 2025</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Sofvie Inc., sudbury Canada</span></li>
-                            <li><span>May 2024 - July 2024</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Profoundus</span></li>
-                            <li><span>June 2022 - Aug 2023</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Intercom Programming & Manufacturing</span></li>
-                            <li><span>Jan 2020- May 2022</span><br>Junior Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Kellogg Tolaram Nigeria Limited </span></li>
-                            
+                        <ul class="timeline">
+                            <li class="timeline-item">
+                                <div class="timeline-date">April 2025 - August 2025</div>
+                                <div class="timeline-title">Software Engineer</div>
+                                <div class="timeline-company">Sofvie Inc., sudbury Canada</div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-date">May 2024 - July 2024</div>
+                                <div class="timeline-title">Software Engineer</div>
+                                <div class="timeline-company">Profoundus</div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-date">June 2022 - Aug 2023</div>
+                                <div class="timeline-title">Software Engineer</div>
+                                <div class="timeline-company">Intercom Programming & Manufacturing</div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-date">Jan 2020- May 2022</div>
+                                <div class="timeline-title">Junior Software Engineer</div>
+                                <div class="timeline-company">Kellogg Tolaram Nigeria Limited</div>
+                            </li>
                         </ul>
                     </div>
                     <!-- Education Navigation -->
                     <div class="tab_content" id="education">
-                        <ul>
-                            <li><span>Jul 2025</span><br>Graduate Certificate, Data Science - <span style="color:#0d0d0d; font-size:15px;">@Cambrian College</span></li>
-                            <li><span>Jul 2024</span><br>Graduate Certificate, Mobile Application Development - <span style="color:#0d0d0d; font-size:15px;">@Cambrian College</span></li>
-                            <li><span>Nov 2018</span><br>Bachelor Of Science in Physics  - <span style="color:#0d0d0d; font-size:15px;">@The Polytechnic Ibadan, Nigeria</span></li>
+                        <ul class="timeline">
+                            <li class="timeline-item">
+                                <div class="timeline-date">Jul 2025</div>
+                                <div class="timeline-title">Graduate Certificate, Data Science</div>
+                                <div class="timeline-company">Cambrian College</div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-date">Jul 2024</div>
+                                <div class="timeline-title">Graduate Certificate, Mobile Application Development</div>
+                                <div class="timeline-company">Cambrian College</div>
+                            </li>
+                            <li class="timeline-item">
+                                <div class="timeline-date">Nov 2018</div>
+                                <div class="timeline-title">Bachelor Of Science in Physics</div>
+                                <div class="timeline-company">The Polytechnic Ibadan, Nigeria</div>
+                            </li>
                         </ul>
                     </div>
                 </div>

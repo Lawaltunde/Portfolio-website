@@ -115,52 +115,6 @@ class BlogPost(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-"""
-/create_admin: Disabled by default for security.
-Enable only temporarily by setting environment variable ENABLE_ADMIN_CREATION=1.
-Optionally set ADMIN_CREATION_TOKEN and pass ?token=... to the route for extra gating.
-Remove this route in production to avoid race-condition exploits.
-"""
-@csrf.exempt
-@app.route('/create_admin', methods=['GET', 'POST'])
-def create_admin():
-    if os.environ.get('ENABLE_ADMIN_CREATION') not in {'1', 'true', 'TRUE', 'True'}:
-        return abort(403)
-
-    token_required = os.environ.get('ADMIN_CREATION_TOKEN')
-    if token_required:
-        provided = request.args.get('token')
-        if not provided or provided != token_required:
-            return abort(403)
-
-    if User.query.first():
-        return "Admin already exists. Remove or comment out this route for security.", 403
-
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '')
-        if not username or not password:
-            return "Username and password required.", 400
-        if len(username) < 3:
-            return "Username must be at least 3 characters.", 400
-        if len(password) < 8:
-            return "Password must be at least 8 characters.", 400
-        user = User(username=username)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect('/login')
-    return '''
-        <h2>Create Admin User</h2>
-        <form method="POST">
-            <label>Username:</label><br>
-            <input type="text" name="username" required><br>
-            <label>Password:</label><br>
-            <input type="password" name="password" required><br><br>
-            <button type="submit">Create Admin</button>
-        </form>
-    '''
-
 # Local-only CLI command to create an admin without exposing an HTTP route
 @app.cli.command('create-admin')
 @click.option('--username', prompt=True)
