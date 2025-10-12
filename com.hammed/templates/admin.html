@@ -3,7 +3,10 @@
 {% block content %}
     <div class="container">
         <h2>Admin Dashboard</h2>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <form action="{{ url_for('logout') }}" method="post" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="linklike" style="background:none;border:none;padding:0;color:#06c;text-decoration:underline;cursor:pointer;">Logout</button>
+        </form>
         <h3>Contact Messages</h3>
         {% if messages %}
             <table border="1" cellpadding="8" cellspacing="0">

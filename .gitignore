@@ -25,3 +25,6 @@ hammedA00276443FinalProject/portfolio.db
 
 # Node (in case of future tooling)
 node_modules/
+
+# Windows ADS metadata files (download provenance)
+*Zone.Identifier

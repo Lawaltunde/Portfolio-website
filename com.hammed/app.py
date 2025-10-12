@@ -1,12 +1,20 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
-
+from flask_wtf import CSRFProtect
+from flask_wtf.csrf import CSRFError, generate_csrf
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import click
+import logging
 
 # Instantiating a Flask class
 app = Flask(__name__)
+
+# Secret key for session management (use environment variable in production)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
 
 # Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -14,11 +22,43 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'po
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+# Whitelist of templates that can be rendered via the dynamic page route
+ALLOWED_TEMPLATES = {
+    'about.html': 'about.html',
+    'portfolio.html': 'portfolio.html',
+    'contact.html': 'contact.html',
+    'thank_you.html': 'thank_you.html',
+    'error404.html': 'error404.html',
+    'login.html': 'login.html',
+    'index.html': 'index.html',
+}
 
 # Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+# CSRF protection
+csrf = CSRFProtect(app)
+
+# Logging setup
+logging.basicConfig(level=os.environ.get('LOG_LEVEL', 'INFO'))
+logger = logging.getLogger(__name__)
+
+# Make csrf_token() available in Jinja templates
+@app.context_processor
+def inject_csrf_token():
+    return dict(csrf_token=generate_csrf)
+
+# CSRF error handler
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return "CSRF token missing or invalid.", 400
+
+# Rate limiting (in-memory). For production, configure a shared backend like Redis.
+limiter = Limiter(get_remote_address, app=app, storage_uri="memory://")
+
+# Dummy password hash for constant-time checks when user does not exist
+DUMMY_PW_HASH = generate_password_hash(os.environ.get('DUMMY_PASSWORD', 'not-the-real-password'))
 
 # Models
 class User(UserMixin, db.Model):
@@ -60,16 +100,36 @@ class BlogPost(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-# One-time admin creation route (remove after use)
+"""
+/create_admin: Disabled by default for security.
+Enable only temporarily by setting environment variable ENABLE_ADMIN_CREATION=1.
+Optionally set ADMIN_CREATION_TOKEN and pass ?token=... to the route for extra gating.
+Remove this route in production to avoid race-condition exploits.
+"""
+@csrf.exempt
 @app.route('/create_admin', methods=['GET', 'POST'])
 def create_admin():
+    if os.environ.get('ENABLE_ADMIN_CREATION') not in {'1', 'true', 'TRUE', 'True'}:
+        return abort(403)
+
+    token_required = os.environ.get('ADMIN_CREATION_TOKEN')
+    if token_required:
+        provided = request.args.get('token')
+        if not provided or provided != token_required:
+            return abort(403)
+
     if User.query.first():
         return "Admin already exists. Remove or comment out this route for security.", 403
+
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
         if not username or not password:
             return "Username and password required.", 400
+        if len(username) < 3:
+            return "Username must be at least 3 characters.", 400
+        if len(password) < 8:
+            return "Password must be at least 8 characters.", 400
         user = User(username=username)
         user.set_password(password)
         db.session.add(user)
@@ -86,6 +146,21 @@ def create_admin():
         </form>
     '''
 
+# Local-only CLI command to create an admin without exposing an HTTP route
+@app.cli.command('create-admin')
+@click.option('--username', prompt=True)
+@click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
+def create_admin_cli(username, password):
+    """Create the first admin user via CLI: flask create-admin"""
+    if User.query.first():
+        click.echo('Admin already exists. Aborting.', err=True)
+        return
+    user = User(username=username.strip())
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
+    click.echo('Admin user created.')
+
 @app.route("/")
 def hello_world():
     return render_template('index.html')
@@ -93,20 +168,30 @@ def hello_world():
 
 # Admin login route
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
         user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
+
+        # Constant-time password verification: always check against a hash
+        hash_to_check = user.password_hash if user else DUMMY_PW_HASH
+        pw_ok = False
+        try:
+            pw_ok = check_password_hash(hash_to_check, password)
+        except Exception:
+            # In case of malformed hash or unexpected error, treat as failure
+            pw_ok = False
+
+        if pw_ok and user is not None:
             login_user(user)
             return redirect('/admin')
-        else:
-            return render_template('login.html', error='Invalid credentials')
+        return render_template('login.html', error='Invalid credentials')
     return render_template('login.html')
 
 # Admin logout route
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
@@ -120,25 +205,76 @@ def admin_dashboard():
     return render_template('admin.html', messages=messages)
 
 @app.route("/<string:page_name>")
-def html_page(page_name):
-    return render_template(page_name)
+def html_page(page_name: str):
+    template = ALLOWED_TEMPLATES.get(page_name)
+    if not template:
+        return abort(404)
+    return render_template(template)
 
 
 # Store message in the database
-def storing_database(data):
-    user_name = data['user_name']
-    email = data['email']
-    subject = data['subject']
-    message = data['text']
-    new_message = Message(user_name=user_name, email=email, subject=subject, message=message)
-    db.session.add(new_message)
-    db.session.commit()
+def storing_database(data: dict) -> None:
+    """Validate input and store a contact message in the database.
+
+    Raises:
+        ValueError: If validation fails for any field.
+        RuntimeError: If a database error occurs while saving.
+    """
+    # Required fields and basic max length constraints aligned with DB schema
+    required_fields = {
+        'user_name': 100,
+        'email': 120,
+        'subject': 200,
+        'text': None,  # message body (no strict DB length, but must be non-empty)
+    }
+
+    # Presence and basic validation
+    cleaned = {}
+    for field, max_len in required_fields.items():
+        if field not in data:
+            raise ValueError(f"Missing required field: {field}")
+        value = str(data.get(field, '')).strip()
+        if not value:
+            raise ValueError(f"Field '{field}' must not be empty")
+        if max_len is not None and len(value) > max_len:
+            raise ValueError(f"Field '{field}' exceeds maximum length of {max_len}")
+        cleaned[field] = value
+
+    # Very basic email sanity check
+    if '@' not in cleaned['email'] or '.' not in cleaned['email']:
+        raise ValueError("Invalid email address format")
+
+    # Map 'text' to message body column
+    new_message = Message(
+        user_name=cleaned['user_name'],
+        email=cleaned['email'],
+        subject=cleaned['subject'],
+        message=cleaned['text'],
+    )
+
+    try:
+        db.session.add(new_message)
+        db.session.commit()
+    except Exception as exc:
+        db.session.rollback()
+        logger.exception("Failed to store contact message: %s", exc)
+        raise RuntimeError("Failed to save message. Please try again later.")
 
 @app.route("/submited_form", methods = ['POST', 'GET'])
 def submited_form():
     if request.method == 'POST':
         data = request.form.to_dict()
-        storing_database(data)
+        try:
+            storing_database(data)
+        except ValueError as ve:
+            # Client error: bad input
+            return str(ve), 400
+        except RuntimeError as re:
+            # Server error while persisting
+            return str(re), 500
+        except Exception:
+            logger.exception("Unexpected error handling contact form")
+            return "Unexpected error", 500
         return redirect('/thank_you.html')
     else:
         return redirect('/error404.html')

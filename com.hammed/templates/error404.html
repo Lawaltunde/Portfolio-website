@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <section class="container" id = "contact">
+    <section class="container" id="contact" role="main" aria-labelledby="error-title">
       <div class="conformation_container_error">
         <div>
-          <lottie-player src="https://assets5.lottiefiles.com/private_files/lf30_wvfo5uzg.json"  background="transparent"  speed="1"  style="width: 900px; height: 600px;"  loop autoplay></lottie-player>
+          <h1 id="error-title">404 - Page Not Found</h1>
+          <p role="alert">The page you’re looking for doesn’t exist or may have been moved. Use the navigation above to find what you need, or return to the home page.</p>
+        </div>
+        <div aria-hidden="true">
+          <lottie-player src="https://assets5.lottiefiles.com/private_files/lf30_wvfo5uzg.json" background="transparent" speed="1" style="width: 900px; height: 600px;" loop autoplay></lottie-player>
         </div>
       </div>
     </section>

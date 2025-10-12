@@ -9,7 +9,7 @@
             <p>I’m eager to apply my skills and contribute to real-world projects</p>
             <div class="contact_list">
               <li><a href=""></a><span style="color:#0057B7">Based in:</span> Canada</li>
-              <li><a href=""></a><span style="color:#FFDD00">Emai:</span> lawalolatunde14@gmail</li>
+              <li><span style="color:#FFDD00">Email:</span> <a href="mailto:lawalolatunde14@gmail.com">lawalolatunde14@gmail.com</a></li>
             </div>
             <div class="contact_social_icons">
               <a href="https://www.linkedin.com/in/hammed-tunde-lawal-b32442258/" target="_blank" ><i class=" fab fa-linkedin " aria-hidden="true"></i></a>
@@ -19,10 +19,18 @@
           </div>
           <div class="contact_form">
             <form action="{{ url_for('submited_form') }}" method="post">
-              <input name="user_name" type="text" placeholder="Your Name" required>
-              <input name="email" type="email" placeholder="Your Email Address" required>
-              <input name="subject" type="text" placeholder="Please specify Subject" required>
-              <textarea name="text" id="" cols="30" rows="10" placeholder="Type your message" required></textarea>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <label for="user_name">Your Name <span aria-hidden="true" title="required">*</span></label>
+              <input id="user_name" name="user_name" type="text" placeholder="Your Name" required aria-required="true">
+
+              <label for="email">Email Address <span aria-hidden="true" title="required">*</span></label>
+              <input id="email" name="email" type="email" placeholder="Your Email Address" required aria-required="true">
+
+              <label for="subject">Subject <span aria-hidden="true" title="required">*</span></label>
+              <input id="subject" name="subject" type="text" placeholder="Please specify Subject" required aria-required="true">
+
+              <label for="message">Message <span aria-hidden="true" title="required">*</span></label>
+              <textarea id="message" name="text" cols="30" rows="10" placeholder="Type your message" required aria-required="true"></textarea>
               <input type="submit" value="Submit" class="send">
             </form>
           </div>

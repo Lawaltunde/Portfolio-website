@@ -5,26 +5,27 @@
              <section class="container about" id="about">
                 <!-- Image me Section -->
                 <div class="about_img">
-                    <img src="{{ url_for('static', filename='images/hammed.jpeg') }}" alt="">
+                    <img src="{{ url_for('static', filename='images/hammed.jpeg') }}" alt="Portrait of Hammed smiling">
                 </div>
                 <!-- Information Section -->
-                <div class="abount_info">
+                <div class="about_info">
                     <h2 class="heading">About <span style="color:#FFDD00">Me</span></h2>
-                    <p>Full-Stack Software Engineer passionate about delivering scalable, high-quality applications that solve real business problems. I collaborate closely with senior developers to translate business requirements into maintainable, impactful software solutions
+                    <p>Full-Stack Software Engineer passionate about delivering scalable, high-quality applications that solve real business problems. I collaborate closely with senior developers to translate business requirements into maintainable, impactful software solutions.
                     </p>
                     <!-- Tab Navigation -->
                     <div class="tab_navigation">
-                        <p class="tab_links active_link" onclick="opentab('skills')">Skills</p>
-                        <p class="tab_links" onclick="opentab('technologies')">Technologies</p>
-                        <p class="tab_links" onclick="opentab('experience')">Experience</p>
-                        <p class="tab_links" onclick="opentab('education')">Education</p>
+                        <p class="tab_links active_link" onclick="opentab('skills', event)">Skills</p>
+                        <p class="tab_links" onclick="opentab('technologies', event)">Technologies</p>
+                        <p class="tab_links" onclick="opentab('experience', event)">Experience</p>
+                        <p class="tab_links" onclick="opentab('education', event)">Education</p>
                     </div>
                     <!-- Skills Navigation -->
                     <div class="tab_content active_tab" id="skills">
                         <ul>
-                            <li><span>Software engineering</span><br>Fullstack - API integration/Development - Unit Testing - Databases - Deployment</li>
-                            <li><span>Data Analysis</span><br>Data Cleaning & Preprocessing - Data visualization - Time Series - Exloratory & Statistical Analysis</li>
-                            <li><span>Machine learning</span><br>Supervised & Unsupervised ML - Deep learning - NLP </li>
+                            <li><span>Software engineering</span><br>-> Full-Stack Development: Python (Django, Flask), Java (Spring Boot), React, JavaScript/TypeScript, HTML/CSS<br>
+                                -> Microservices & DevOps: Docker, Kubernetes, Git, CI/CD pipelines, cloud-ready architectures<br>
+                                -> Database Design & Management: PostgreSQL, MySQL, MongoDB, query optimization, scalable modeling<br>
+                                -> AI-Ehanced Solutions: Intelligent integrations and scalable application features</li>
                         </ul>
                     </div>
                     <!-- Technologies Navigation -->
@@ -33,41 +34,24 @@
                             <li><span>Web Development & Databases</span><br>
                                 <object data="{{ url_for('static', filename='images/svg/html-1.svg') }}" width="40" height="40"> </object>
                                 <object data="{{ url_for('static', filename='images/svg/css-3.svg') }}" width="40" height="40"> </object>
+                                <object data="{{ url_for('static', filename='images/svg/javascript-1.svg') }}" width="40" height="40"> </object><br><br>
+                                <object data="{{ url_for('static', filename='images/svg/node.png') }}" width="40" height="40"> </object>
+                                <object data="{{ url_for('static', filename='images/svg/tpscript.jpg') }}" width="40" height="40"> </object><br><br>
                                 <object data="{{ url_for('static', filename='images/svg/java.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/javascript-1.svg') }}" width="40" height="40"> </object>
                                 <object data="{{ url_for('static', filename='images/svg/flask-logo (1).svg') }}" width="70" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/fastapi-1.svg') }}" width="40" height="40"> </object>
+                                <object data="{{ url_for('static', filename='images/svg/fastapi-1.svg') }}" width="40" height="40"> </object><br><br>
                                 <object data="{{ url_for('static', filename='images/svg/mysql.svg') }}" width="40" height="40"> </object>
                                 <object data="{{ url_for('static', filename='images/svg/postgresql.svg') }}" width="40" height="40"> </object>
-                            </li>
-                            <li><span>Data Analysis & Data Science</span><br>
-                                <object data="{{ url_for('static', filename='images/svg/python-5.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/numpy-1.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/pandas-svgrepo-com.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/seaborn-icon.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/plot_ly-icon.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/matplotlib-icon.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/spy.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/scipy.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/streamlit-logo-primary-colormark-darktext (1).svg') }}" width="70" height="50"> </object>
-                            </li>
-                            <li><span>Machine Learning & Deep Learning</span><br>
-                                <object data="{{ url_for('static', filename='images/svg/icons8-tensorflow.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/pytorch-svgrepo-com.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/keras-svgrepo-com.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/opencv-icon.svg') }}" width="40" height="40"> </object>
-                                <object data="{{ url_for('static', filename='images/svg/390px-Scikit_learn_logo_small.svg.png') }}" width="60" height="30"> </object>
-
                             </li>
                         </ul>
                     </div>
                     <!-- Experience Navigation -->
                     <div class="tab_content" id="experience">
                         <ul>
-                            <li><span>May 2024 - July 2024</span><br>API Developer - <span style="color:#0d0d0d; font-size:15px;">@Profoundus</span></li>
-                            <li><span>June 2022 - Aug 2023</span><br>Developer - <span style="color:#0d0d0d; font-size:15px;">@Intercom Programming & Manufacturing</span></li>
+                            <li><span>April 2025 - August 2025</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Sofvie Inc., sudbury Canada</span></li>
+                            <li><span>May 2024 - July 2024</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Profoundus</span></li>
+                            <li><span>June 2022 - Aug 2023</span><br>Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Intercom Programming & Manufacturing</span></li>
                             <li><span>Jan 2020- May 2022</span><br>Junior Software Engineer - <span style="color:#0d0d0d; font-size:15px;">@Kellogg Tolaram Nigeria Limited </span></li>
-                            <li><span>June 2019 - May 2020</span><br>Research Lab Technician - <span style="color:#0d0d0d; font-size:15px;">@St. Anthony Institute – NYSC Placement, Nigeria</span></li>
                             
                         </ul>
                     </div>

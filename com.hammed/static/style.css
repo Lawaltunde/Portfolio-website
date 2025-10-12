@@ -5,7 +5,6 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
-	outline: none;
 	border: none;
 	text-decoration: none;
 	list-style: none;
@@ -33,6 +32,60 @@ body{
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+}
+
+/* Accessible focus styles */
+/* Provide clear focus indicators for keyboard users across interactive controls */
+/* Base focus ring for common controls */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+/* Buttons and primary call-to-action */
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.contact_form form .send:focus-visible,
+.nav-button button:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 4px var(--color-primary-light), 0 0.5rem 1rem var(--color-primary-light);
+}
+
+/* Navigation links */
+nav ul li a:focus-visible,
+.nav-container a:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 4px;
+}
+
+/* Icon-only circular links */
+.header-container .social a:focus-visible,
+.contact_social_icons a:focus-visible,
+.portfolio_layer a:focus-visible {
+	outline: 3px solid var(--color-primary);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+
+/* Inputs and textareas explicit focus state (in addition to base) */
+.contact_form form input:focus-visible,
+.contact_form form textarea:focus-visible {
+	border-bottom-color: var(--color-primary);
+}
+
+/* Footer contrast-aware focus ring */
+footer .footer-container a:focus-visible,
+footer .footer-container .social a:focus-visible {
+	outline: 3px solid var(--color-light);
+	outline-offset: 3px;
+	box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
 }
 
 main {
@@ -158,7 +211,7 @@ nav .nav-container ul li a.nav-active{
 	margin-top: 5rem;
 	display: grid;
 	grid-template-columns: 5rem auto 26rem;
-	gap: 2;
+	gap: 2rem;
 }
 .header-container .social{
 	display: flex;
@@ -293,7 +346,7 @@ nav .nav-container ul li a.nav-active{
 	height: 100%;
 	border-radius: 15px;
 }
-.abount_info{
+.about_info{
 	flex-basis: 65%;
 }
 .heading{
@@ -301,15 +354,15 @@ nav .nav-container ul li a.nav-active{
 	font-size: 3.3rem;
 	font-weight: 900;
 }
-.abount_info h2{
+.about_info h2{
 	text-align: left;
 	line-height: 1.2;
 	color: var(--color-dark)
 }
-.abount_info h3 {
+.about_info h3 {
 	color: var(--color-dark)
 }
-.abount_info p {
+.about_info p {
 	color: var(--color-black);
 	text-align: left;
 }
@@ -491,7 +544,6 @@ nav .nav-container ul li a.nav-active{
 }
 .contact_form form input, form textarea{
 	border: none;
-	outline: none;
 	width: 100%;
 	padding: 18px;
 	border: none;
@@ -590,7 +642,7 @@ footer{
 		margin-right: 50px;
 		box-shadow: 0px 0px 10px rgba(0, 0, 1, 1);
 	}
-	.abount_info{
+	.about_info{
 		width: 620px;
 	}
 }
@@ -616,13 +668,13 @@ footer{
 		margin-top: -50px;
 		margin-bottom: 25px;
 	}
-	.abount_info{
+	.about_info{
 		margin-left: 140px;
 	}
-	.abount_info h2{
+	.about_info h2{
 		text-align: center;
 	}
-	.abount_info p {
+	.about_info p {
 		color: var(--color-black);
 		text-align: center;
 	}
@@ -716,13 +768,13 @@ footer{
 		margin-top: -50px;
 		margin-bottom: 25px;
 	}
-	.abount_info{
+	.about_info{
 		margin-left: 70px;
 	}
-	.abount_info h2{
+	.about_info h2{
 		text-align: center;
 	}
-	.abount_info p {
+	.about_info p {
 		color: var(--color-black);
 		text-align: center;
 	}
@@ -734,13 +786,13 @@ footer{
 		margin-top: -50px;
 		margin-bottom: 25px;
 	}
-	.abount_info{
+	.about_info{
 		margin-left: 10px;
 	}
-	.abount_info h2{
+	.about_info h2{
 		text-align: center;
 	}
-	.abount_info p {
+	.about_info p {
 		color: var(--color-black);
 		text-align: center;
 	}
@@ -783,7 +835,7 @@ footer{
 		font-size: .68rem;
 	}
 	/* Header */
-	.Header{
+	.header{
 		padding-bottom: 0;
 		padding-top: 7rem;
 	}
@@ -842,14 +894,14 @@ footer{
 		margin-top: 35px;
 		position: relative;
 	}
-	.abount_info{
+	.about_info{
 		margin-left: 12px;
 		width: 550px;
 	}
-	.abount_info h2{
+	.about_info h2{
 		text-align: center;
 	}
-	.abount_info p {
+	.about_info p {
 		color: var(--color-black);
 		text-align: center;
 		font-size: 15px;
@@ -894,10 +946,10 @@ footer{
 		height: 250px;
 		margin-left: 74px;
 	}
-	.abount_info{
+	.about_info{
 		width: 360px;
 	}
-	.abount_info p{
+	.about_info p{
 		font-size: 14px;
 	}
 	.tab_links{
