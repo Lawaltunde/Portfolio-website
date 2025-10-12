@@ -9,3 +9,5 @@ flask_sqlalchemy
 Flask-WTF
 Flask-Limiter
 Flask-Login==0.6.3
+Flask-Mail
+python-dotenv

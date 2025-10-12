@@ -18,21 +18,33 @@
             </div>
           </div>
           <div class="contact_form">
-            <form action="{{ url_for('submited_form') }}" method="post">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <label for="user_name">Your Name <span aria-hidden="true" title="required">*</span></label>
-              <input id="user_name" name="user_name" type="text" placeholder="Your Name" required aria-required="true">
-
-              <label for="email">Email Address <span aria-hidden="true" title="required">*</span></label>
-              <input id="email" name="email" type="email" placeholder="Your Email Address" required aria-required="true">
-
-              <label for="subject">Subject <span aria-hidden="true" title="required">*</span></label>
-              <input id="subject" name="subject" type="text" placeholder="Please specify Subject" required aria-required="true">
-
-              <label for="message">Message <span aria-hidden="true" title="required">*</span></label>
-              <textarea id="message" name="text" cols="30" rows="10" placeholder="Type your message" required aria-required="true"></textarea>
-              <input type="submit" value="Submit" class="send">
-            </form>
+            <div class="form-container">
+                <form action="/submited_form" method="post" class="contact-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="user_name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Your Email</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter a valid email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" required placeholder="What is the subject of your message?">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="text" rows="5" required placeholder="Please enter your message here"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </div>
+            
+            <div class="contact-info">
+                <h3>Contact Information</h3>
+                <p><i class="fas fa-envelope"></i> softwaredeveloper0210@gmail.com</p>
+            </div>
           </div>
         </section>
 {% endblock %}

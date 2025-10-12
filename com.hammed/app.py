@@ -7,8 +7,14 @@ from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError, generate_csrf
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from sqlalchemy.exc import IntegrityError
+from email_validator import validate_email as _validate_email, EmailNotValidError
 import click
 import logging
+from flask_mail import Mail, Message as MailMessage
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Instantiating a Flask class
 app = Flask(__name__)
@@ -21,6 +27,15 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'portfolio.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Mail configuration
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
+app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+
+mail = Mail(app)
 db = SQLAlchemy(app)
 # Whitelist of templates that can be rendered via the dynamic page route
 ALLOWED_TEMPLATES = {
@@ -151,15 +166,19 @@ def create_admin():
 @click.option('--username', prompt=True)
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
 def create_admin_cli(username, password):
-    """Create the first admin user via CLI: flask create-admin"""
-    if User.query.first():
-        click.echo('Admin already exists. Aborting.', err=True)
-        return
+    """Create an admin user via CLI in an atomic way: flask create-admin"""
     user = User(username=username.strip())
     user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-    click.echo('Admin user created.')
+    try:
+        db.session.add(user)
+        db.session.commit()
+        click.echo('Admin user created.')
+    except IntegrityError:
+        db.session.rollback()
+        click.echo('Admin creation failed: username already exists or a concurrent creation occurred.', err=True)
+    except Exception as e:
+        db.session.rollback()
+        click.echo(f'Admin creation failed: {e}', err=True)
 
 @app.route("/")
 def hello_world():
@@ -240,9 +259,13 @@ def storing_database(data: dict) -> None:
             raise ValueError(f"Field '{field}' exceeds maximum length of {max_len}")
         cleaned[field] = value
 
-    # Very basic email sanity check
-    if '@' not in cleaned['email'] or '.' not in cleaned['email']:
-        raise ValueError("Invalid email address format")
+    # Robust email validation
+    try:
+        # Validate format; skip deliverability/MX checks to avoid network calls
+        validated = _validate_email(cleaned['email'], check_deliverability=False)
+        cleaned['email'] = validated.email  # use normalized form
+    except EmailNotValidError as e:
+        raise ValueError(f"Invalid email address: {str(e)}")
 
     # Map 'text' to message body column
     new_message = Message(
@@ -260,12 +283,31 @@ def storing_database(data: dict) -> None:
         logger.exception("Failed to store contact message: %s", exc)
         raise RuntimeError("Failed to save message. Please try again later.")
 
-@app.route("/submited_form", methods = ['POST', 'GET'])
+def send_email(subject, recipients, template, **kwargs):
+    """Send an email notification using a template."""
+    msg = MailMessage(subject, recipients=recipients)
+    msg.html = render_template(template, **kwargs)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        logger.error(f"Failed to send email: {e}")
+
+
+@app.route("/submited_form", methods=['POST', 'GET'])
 def submited_form():
     if request.method == 'POST':
         data = request.form.to_dict()
         try:
             storing_database(data)
+            # Send email notification using the new template
+            send_email(
+                subject=f"New Inquiry from {data.get('user_name', 'a visitor')}: {data.get('subject', '')}",
+                recipients=[os.environ.get('MAIL_DEFAULT_SENDER')],
+                template='email_template.html',
+                name=data.get('user_name'),
+                email=data.get('email'),
+                message=data.get('text')
+            )
         except ValueError as ve:
             # Client error: bad input
             return str(ve), 400
