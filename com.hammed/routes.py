@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from . import db, limiter
 from .models import Project, User, BlogPost
 from .utils import storing_database, send_email
+from flask import session
 import os
 import logging
 from pathlib import Path
@@ -75,6 +76,9 @@ def admin_projects():
         uploaded = request.files.get('image_file')
         if mode == 'supabase':
             ctx = get_supabase_context_from_env()
+            if not session.get('supabase_token'):
+                flash('Admin token missing. Please log out and log in again to continue.', 'warning')
+                return redirect(url_for('routes.admin_projects'))
             if uploaded and uploaded.filename and ctx is not None:
                 filename = secure_filename(uploaded.filename)
                 from .supabase_repo import ProjectRepo as _PR
@@ -284,6 +288,9 @@ def admin_blogs():
             return redirect(url_for('routes.admin_blogs'))
         if mode == 'supabase':
             ctx = get_supabase_context_from_env()
+            if not session.get('supabase_token'):
+                flash('Admin token missing. Please log out and log in again to continue.', 'warning')
+                return redirect(url_for('routes.admin_blogs'))
             if ctx is not None:
                 ok = BlogRepo(ctx).create_post(title.strip(), content.strip()) is not None
                 if not ok:

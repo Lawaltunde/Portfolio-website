@@ -2,6 +2,7 @@ import os
 import io
 import uuid
 from typing import Any, Dict, List, Optional, Tuple
+import logging
 from datetime import datetime
 
 from flask import session
@@ -65,7 +66,8 @@ class ProjectRepo:
             )
             public = client.storage.from_(self.bucket).get_public_url(key)
             return public
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase upload_image failed: %s", e)
             return None
 
     # ---------- Projects (table: projects) ----------
@@ -78,7 +80,8 @@ class ProjectRepo:
                 client.table("projects").select("*").order("id", desc=True).execute()
             )
             return resp.data or []
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase list_projects failed: %s", e)
             return []
 
     def get_project(self, project_id: int) -> Optional[Dict[str, Any]]:
@@ -88,7 +91,8 @@ class ProjectRepo:
         try:
             resp = client.table("projects").select("*").eq("id", project_id).single().execute()
             return resp.data
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase get_project failed: %s", e)
             return None
 
     def create_project(
@@ -112,7 +116,8 @@ class ProjectRepo:
         try:
             resp = client.table("projects").insert(payload).select("*").single().execute()
             return resp.data
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase create_project failed: %s", e)
             return None
 
     def update_project(
@@ -126,7 +131,8 @@ class ProjectRepo:
         try:
             client.table("projects").update(fields).eq("id", project_id).execute()
             return True
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase update_project failed: %s", e)
             return False
 
     def delete_project(self, project_id: int) -> bool:
@@ -136,7 +142,8 @@ class ProjectRepo:
         try:
             client.table("projects").delete().eq("id", project_id).execute()
             return True
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase delete_project failed: %s", e)
             return False
 
 
@@ -151,7 +158,8 @@ class BlogRepo:
         try:
             resp = client.table("blog_posts").select("*").order("created_at", desc=True).execute()
             return resp.data or []
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase list_posts failed: %s", e)
             return []
 
     def get_post(self, post_id: int) -> Optional[Dict[str, Any]]:
@@ -161,7 +169,8 @@ class BlogRepo:
         try:
             resp = client.table("blog_posts").select("*").eq("id", post_id).single().execute()
             return resp.data
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase get_post failed: %s", e)
             return None
 
     def create_post(self, title: str, content: str) -> Optional[Dict[str, Any]]:
@@ -172,7 +181,8 @@ class BlogRepo:
         try:
             resp = client.table("blog_posts").insert(payload).select("*").single().execute()
             return resp.data
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase create_post failed: %s", e)
             return None
 
     def delete_post(self, post_id: int) -> bool:
@@ -182,7 +192,8 @@ class BlogRepo:
         try:
             client.table("blog_posts").delete().eq("id", post_id).execute()
             return True
-        except Exception:
+        except Exception as e:
+            logging.getLogger(__name__).exception("Supabase delete_post failed: %s", e)
             return False
 
 
