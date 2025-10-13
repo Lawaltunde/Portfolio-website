@@ -1,0 +1,28 @@
+.register-container {
+    max-width: 450px;
+}
+
+.form-title {
+    margin-bottom: 25px;
+}
+
+.error-message {
+    color: var(--color-warning);
+    background-color: rgba(255, 206, 49, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.submit-btn {
+    padding: 12px;
+    font-size: 18px;
+}
+
+.switch-form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}

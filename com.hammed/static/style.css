@@ -34,6 +34,14 @@ body{
     min-height: 100vh;
 }
 
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* page layout managed on body */
+
 /* Accessible focus styles */
 /* Provide clear focus indicators for keyboard users across interactive controls */
 /* Base focus ring for common controls */
@@ -88,9 +96,7 @@ footer .footer-container .social a:focus-visible {
 	box-shadow: 0 0 0 4px rgba(255,255,255,0.25);
 }
 
-main {
-    flex: 1;
-}
+/* main already flex container above */
 h1,h2,h3,h4,h5{
 	color: var(--color-black);
 	line-height: 1.2;
@@ -161,7 +167,7 @@ nav{
 	height:6rem;
 	justify-content: center;
 	top: 0;
-	z-index: 800;
+	z-index: 10000;
 	border-bottom: 1px solid var(--color-light);
 	background: var(--color-white);
 }
@@ -2384,31 +2390,3 @@ footer{
 .tab_links{
 	margin-right: 37px;
 }
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.tab_links{
-	margin-right: 37px;
-}
-.

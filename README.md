@@ -6,11 +6,8 @@ Welcome to the repository for my personal portfolio website! This site is a livi
 
 *   **Home Page**: A welcoming introduction with a brief summary of my skills and passion.
 *   **About Page**: A deeper dive into my background, professional experience, and the technologies I work with.
-*   **Portfolio Page**: A curated gallery of my projects, complete with descriptions and links to live demos and source code.
 *   **Contact Page**: A functional contact form that allows visitors to get in touch with me directly.
 *   **Responsive Design**: The website is fully responsive, providing an optimal viewing experience across desktops, tablets, and mobile devices.
-*   **Interactive UI**: Smooth animations and transitions using ScrollReveal and Typed.js to create a more engaging user experience.
-
 ## 🛠️ Tech Stack
 
 <p align="left">
@@ -19,7 +16,6 @@ Welcome to the repository for my personal portfolio website! This site is a livi
   </a>
 </p>
 
-### Frontend
 
 *   **HTML5**
 *   **CSS3**
@@ -61,7 +57,27 @@ To run this project locally, follow these steps:
 
 5.  Open your browser and navigate to `http://127.0.0.1:5000`.
 
-## 📂 File Structure
+## � Configuration
+
+- DATA_BACKEND: Choose the data store. Options: `supabase` or `sqlite`.
+    - If not set, the app auto-selects `supabase` when `SUPABASE_URL` and `SUPABASE_KEY` are present; otherwise `sqlite`.
+    - In production, set `DATA_BACKEND=supabase` and provide Supabase env vars.
+- SUPABASE_URL, SUPABASE_KEY (or NEXT_PUBLIC_* fallbacks): Required for Supabase mode.
+- SUPABASE_SERVICE_ROLE_KEY: Optional; used only for one-off migrations via `migrate_to_supabase.py`.
+
+## ☁️ Deploying to Render or Vercel
+
+- Render (recommended for Flask):
+    - Build command: `pip install -r com.hammed/requirements.txt`
+    - Start command: `gunicorn --chdir . wsgi:app`
+    - Environment: `DATA_BACKEND=supabase`, plus Supabase envs and `SECRET_KEY`.
+- Vercel:
+    - Use Vercel’s Python/Flask template or `vercel-python-wsgi`. Configure `wsgi.py` as the entry point.
+    - Set the same environment variables as above.
+
+In production, the app will not fallback to SQLite when `DATA_BACKEND=supabase` is set—writes will fail fast if Supabase is unavailable.
+
+## �📂 File Structure
 
 ```
 hammedA00276443FinalProject/

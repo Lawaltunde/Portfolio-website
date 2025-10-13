@@ -1,4 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+/* Removed external Google Fonts import to avoid third-party calls. */
+/* Self-host font files under /static/fonts and reference them below. */
+
+/* Poppins Regular */
+@font-face {
+    font-family: 'Poppins';
+    src: url('fonts/Poppins-Regular.woff2') format('woff2'),
+         url('fonts/Poppins-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+/* Poppins Medium */
+@font-face {
+    font-family: 'Poppins';
+    src: url('fonts/Poppins-Medium.woff2') format('woff2'),
+         url('fonts/Poppins-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+/* Poppins SemiBold */
+@font-face {
+    font-family: 'Poppins';
+    src: url('fonts/Poppins-SemiBold.woff2') format('woff2'),
+         url('fonts/Poppins-SemiBold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+/* Poppins Bold */
+@font-face {
+    font-family: 'Poppins';
+    src: url('fonts/Poppins-Bold.woff2') format('woff2'),
+         url('fonts/Poppins-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Admin UI font stack: Poppins with system fallbacks */
+body, .admin-container {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif,
+                 'Apple Color Emoji', 'Segoe UI Emoji';
+}
 
 :root {
     --color-white: #fff;
@@ -13,9 +58,18 @@
 }
 
 .admin-container {
-    margin: 2rem auto;
+    /* Push content below the fixed navbar (6rem) plus breathing room */
+    margin: 8rem auto 2rem;
     width: 90%;
     max-width: 1200px;
+}
+
+/* When this stylesheet is present (admin pages), make main start at top
+   instead of centered so headers/buttons aren’t hidden by the fixed nav. */
+main {
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-top: 0; /* spacing handled via .admin-container margin */
 }
 
 .admin-container h2 {
@@ -64,3 +118,145 @@
     text-decoration: underline;
     cursor: pointer;
 }
+
+/* New admin layout components */
+.admin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.admin-nav {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+.card {
+    background: var(--color-white);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    margin-bottom: 1.25rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    background: var(--color-primary);
+    color: var(--color-white);
+    border: 0;
+    border-radius: 8px;
+    padding: .6rem 1rem;
+    font-weight: 600;
+    transition: transform var(--transition), background var(--transition), opacity var(--transition);
+}
+
+.btn:hover { opacity: .92; }
+.btn:active { transform: translateY(1px); }
+.btn-danger { background: #d93025; }
+.btn-light { background: #eef3fb; color: #0b57d0; }
+
+.grid-form {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+}
+
+.grid-form label {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: .35rem;
+    grid-column: span 6;
+}
+
+.grid-form label.full { grid-column: 1 / -1; }
+.grid-form input[type="text"],
+.grid-form input[type="url"],
+.grid-form input[type="file"],
+.grid-form textarea {
+    width: 100%;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: .6rem .75rem;
+    font: inherit;
+}
+
+.grid-form textarea { resize: vertical; }
+.grid-form .actions { display: flex; justify-content: flex-end; }
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+}
+
+.item-card {
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    display: grid;
+    grid-template-rows: 160px auto;
+}
+
+.item-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #fafafa;
+}
+
+.item-card .content { padding: .75rem; display: grid; gap: .5rem; }
+.item-card .meta { color: #6b7280; font-size: .9rem; }
+
+.item-actions {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.list { display: grid; gap: .75rem; }
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .75rem 1rem;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    background: #fff;
+}
+.list-item .text { display: grid; gap: .25rem; }
+.list-item .meta { color: #6b7280; font-size: .9rem; }
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .grid-form { grid-template-columns: repeat(6, 1fr); }
+    .grid-form label { grid-column: 1 / -1; }
+    .admin-header { flex-direction: column; align-items: flex-start; }
+}
+
+/* Avatar logout button */
+.avatar-wrap { display: flex; align-items: center; }
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 0;
+    background: #111827;
+    color: #fff;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* Table helpers */
+.table-responsive { overflow-x: auto; }
+.row-actions { display: flex; gap: .5rem; }

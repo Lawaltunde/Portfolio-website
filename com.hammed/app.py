@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, abort
+import os
+from flask import Flask, render_template, request, redirect, abort, flash, url_for
+from supabase import create_client, Client
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from flask_wtf import CSRFProtect
@@ -12,12 +14,27 @@ from email_validator import validate_email as _validate_email, EmailNotValidErro
 import click
 import logging
 from flask_mail import Mail, Message as MailMessage
-from dotenv import load_dotenv
 
-load_dotenv()
+
+from dotenv import load_dotenv
+from pathlib import Path
 
 # Instantiating a Flask class
 app = Flask(__name__)
+
+# Load environment variables from .env file
+dotenv_path = Path('./.env')
+load_dotenv(dotenv_path=dotenv_path)
+
+# Initialize Supabase client (legacy path). Prefer factory in __init__.py
+url: str = os.environ.get("SUPABASE_URL") or os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY") or os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+supabase: Client | None = None
+if url and key:
+    try:
+        supabase = create_client(url, key)
+    except Exception:
+        logging.getLogger(__name__).exception("Failed to initialize Supabase client in app.py")
 
 # Secret key for session management (use environment variable in production)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
@@ -45,6 +62,8 @@ ALLOWED_TEMPLATES = {
     'thank_you.html': 'thank_you.html',
     'error404.html': 'error404.html',
     'login.html': 'login.html',
+    'register.html': 'register.html',
+    'dashboard.html': 'dashboard.html',
     'index.html': 'index.html',
 }
 
@@ -72,14 +91,15 @@ def handle_csrf_error(e):
 # Rate limiting (in-memory). For production, configure a shared backend like Redis.
 limiter = Limiter(get_remote_address, app=app, storage_uri="memory://")
 
-# Dummy password hash for constant-time checks when user does not exist
-DUMMY_PW_HASH = generate_password_hash(os.environ.get('DUMMY_PASSWORD', 'not-the-real-password'))
+
 
 # Models
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
+    projects = db.relationship('Project', backref='user', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -95,6 +115,7 @@ class Project(db.Model):
     github_url = db.Column(db.String(200))
     image_url = db.Column(db.String(200))
     tech_stack = db.Column(db.String(200))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 # Flask-Login user loader (must be outside class)
 @login_manager.user_loader
@@ -119,9 +140,10 @@ class BlogPost(db.Model):
 @app.cli.command('create-admin')
 @click.option('--username', prompt=True)
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
-def create_admin_cli(username, password):
+@click.option('--role', default='admin', help='The role of the user to create.')
+def create_admin_cli(username, password, role):
     """Create an admin user via CLI in an atomic way: flask create-admin"""
-    user = User(username=username.strip())
+    user = User(username=username.strip(), role=role)
     user.set_password(password)
     try:
         db.session.add(user)
@@ -143,25 +165,38 @@ def hello_world():
 @app.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")
 def login():
-    if request.method == 'POST':
-        username = request.form.get('username', '')
-        password = request.form.get('password', '')
-        user = User.query.filter_by(username=username).first()
-
-        # Constant-time password verification: always check against a hash
-        hash_to_check = user.password_hash if user else DUMMY_PW_HASH
-        pw_ok = False
+    form = LoginForm()
+    if form.validate_on_submit():
         try:
-            pw_ok = check_password_hash(hash_to_check, password)
-        except Exception:
-            # In case of malformed hash or unexpected error, treat as failure
-            pw_ok = False
-
-        if pw_ok and user is not None:
+            user = supabase.auth.sign_in_with_password({
+                "email": form.email.data,
+                "password": form.password.data
+            })
             login_user(user)
-            return redirect('/admin')
-        return render_template('login.html', error='Invalid credentials')
-    return render_template('login.html')
+            if user.user.user_metadata.get('role') == 'admin':
+                return redirect('/admin')
+            return redirect('/dashboard')
+        except Exception as e:
+            flash('Invalid email or password', 'danger')
+    return render_template('login.html', form=form)
+
+# Register route
+@app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
+            user = supabase.auth.sign_up({
+                "email": form.email.data,
+                "password": form.password.data,
+            })
+            login_user(user)
+            return redirect('/dashboard')
+        except Exception as e:
+            flash('Registration failed: ' + str(e), 'danger')
+    return render_template('register.html', form=form)
+
 
 # Admin logout route
 @app.route('/logout', methods=['POST'])
@@ -174,8 +209,77 @@ def logout():
 @app.route('/admin')
 @login_required
 def admin_dashboard():
-    messages = Message.query.order_by(Message.timestamp.desc()).all()
-    return render_template('admin.html', messages=messages)
+    if current_user.role != 'admin':
+        abort(403)
+    projects = Project.query.all()
+    return render_template('dashboard.html', projects=projects, is_admin=True)
+
+# Project dashboard
+@app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    if current_user.role == 'admin':
+        return redirect(url_for('admin_dashboard'))
+    if request.method == 'POST':
+        title = request.form.get('title')
+        description = request.form.get('description')
+        github_url = request.form.get('github_url')
+        image_url = request.form.get('image_url')
+        tech_stack = request.form.get('tech_stack')
+
+        new_project = Project(
+            title=title,
+            description=description,
+            github_url=github_url,
+            image_url=image_url,
+            tech_stack=tech_stack,
+            user_id=current_user.id
+        )
+        db.session.add(new_project)
+        db.session.commit()
+        return redirect('/dashboard')
+
+    projects = Project.query.filter_by(user_id=current_user.id).all()
+    return render_template('dashboard.html', projects=projects)
+
+# Edit project
+@app.route('/edit_project/<int:project_id>', methods=['GET', 'POST'])
+@login_required
+def edit_project(project_id):
+    project = Project.query.get_or_404(project_id)
+    if project.user_id != current_user.id:
+        abort(403)
+
+    if request.method == 'POST':
+        project.title = request.form.get('title')
+        project.description = request.form.get('description')
+        project.github_url = request.form.get('github_url')
+        project.image_url = request.form.get('image_url')
+        project.tech_stack = request.form.get('tech_stack')
+        db.session.commit()
+        return redirect('/dashboard')
+
+    return render_template('edit_project.html', project=project)
+
+# Delete project
+@app.route('/delete_project/<int:project_id>', methods=['POST'])
+@login_required
+def delete_project(project_id):
+    project = Project.query.get_or_404(project_id)
+    if project.user_id != current_user.id:
+        abort(403)
+    
+    db.session.delete(project)
+    db.session.commit()
+    return redirect('/dashboard')
+
+@app.route('/user/<username>')
+@login_required
+def user_page(username):
+    if current_user.username != username:
+        abort(403)
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('user_page.html', user=user)
 
 @app.route("/<string:page_name>")
 def html_page(page_name: str):

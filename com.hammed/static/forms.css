@@ -12,56 +12,61 @@
     --transition: .4s ease;
 }
 
-.login-container {
+.form-container {
     background-color: var(--color-white);
-    padding: 40px;
+    padding: 30px;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
     text-align: center;
-    margin: 5rem auto;
+    transition: all 0.3s ease-in-out;
 }
 
-.login-container h2 {
+.form-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.form-container h2 {
     color: var(--color-black);
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: 15px;
+    font-size: 22px;
 }
 
-.login-container .form-group {
-    margin-bottom: 20px;
+.form-container .form-group {
+    margin-bottom: 15px;
     text-align: left;
 }
 
-.login-container label {
+.form-container label {
     display: block;
     margin-bottom: 5px;
     color: var(--color-dark);
     font-weight: 500;
 }
 
-.login-container input[type="text"],
-.login-container input[type="password"] {
+.form-container input[type="text"],
+.form-container input[type="password"] {
     width: 100%;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 16px;
+    font-size: 14px;
     box-sizing: border-box;
 }
 
-.login-container input[type="text"]:focus,
-.login-container input[type="password"]:focus {
+.form-container input[type="text"]:focus,
+.form-container input[type="password"]:focus {
     outline: none;
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-.login-container .btn {
+.form-container .btn {
     background-color: var(--color-primary);
     color: var(--color-white);
-    padding: 12px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     width: 100%;
@@ -70,11 +75,11 @@
     transition: background-color var(--transition);
 }
 
-.login-container .btn:hover {
+.form-container .btn:hover {
     background-color: #004494;
 }
 
-.login-container .error {
+.form-container .error {
     color: #d9534f;
     margin-bottom: 15px;
 }

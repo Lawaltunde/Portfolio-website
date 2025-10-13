@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="container blog-detail">
+  <article>
+    <h1>{{ post.title }}</h1>
+    <p class="meta">{{ post.created_at }}</p>
+    <div class="content">
+      {{ post.content | e | replace('\n','<br>') | safe }}
+    </div>
+  </article>
+</section>
+{% endblock %}

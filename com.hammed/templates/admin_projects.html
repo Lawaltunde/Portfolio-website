@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+<div class="admin-container">
+  <div class="admin-header">
+    <h2>Projects Manager</h2>
+    <div class="admin-nav">
+      <a class="btn btn-light" href="{{ url_for('routes.admin_blogs') }}">Manage Blog</a>
+      <form action="{{ url_for('auth.logout') }}" method="post" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="linklike">Logout</button>
+      </form>
+    </div>
+  </div>
+
+  <section class="card">
+    <h3>Add New Project</h3>
+    <form method="POST" action="{{ url_for('routes.admin_projects') }}" enctype="multipart/form-data" class="grid-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>
+        <span>Title</span>
+        <input type="text" name="title" required>
+      </label>
+      <label class="full">
+        <span>Description</span>
+        <textarea name="description" rows="4" required></textarea>
+      </label>
+      <label>
+        <span>GitHub URL</span>
+        <input type="url" name="github_url" placeholder="https://github.com/…">
+      </label>
+      <label>
+        <span>Tech Stack</span>
+        <input type="text" name="tech_stack" placeholder="python, flask, supabase">
+      </label>
+      <label>
+        <span>Image URL (optional)</span>
+        <input type="text" name="image_url" placeholder="images/portfolio.jpeg or full URL">
+      </label>
+      <label>
+        <span>Upload Image (optional)</span>
+        <input type="file" name="image_file" accept="image/*">
+      </label>
+      <div class="actions full">
+        <button type="submit" class="btn">Add Project</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <h3>Your Projects</h3>
+    <div class="cards-grid">
+      {% for project in projects %}
+        <article class="item-card">
+          {% if project.image_url %}
+            <img src="{{ project.image_url }}" alt="{{ project.title }}" loading="lazy" />
+          {% endif %}
+          <div class="content">
+            <h4>{{ project.title }}</h4>
+            <p>{{ project.description }}</p>
+            {% if project.tech_stack %}
+            <p class="meta"><strong>Tech:</strong> {{ project.tech_stack }}</p>
+            {% endif %}
+            <div class="item-actions">
+              {% if project.github_url %}
+                <a href="{{ project.github_url }}" target="_blank" class="btn btn-light">GitHub</a>
+              {% endif %}
+              <a href="{{ url_for('routes.edit_project', project_id=project.id) }}" class="btn">Edit</a>
+              <form method="POST" action="{{ url_for('routes.delete_project', project_id=project.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            </div>
+          </div>
+        </article>
+      {% else %}
+        <p>You haven't added any projects yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

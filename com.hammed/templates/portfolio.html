@@ -34,5 +34,23 @@
                       </div>
                   </div>
               </div>
+          
+                    <!-- Dynamic Projects from Admin Dashboard -->
+                            {% if projects %}
+                                <div class="portfolio_container">
+                                    {% for p in projects %}
+                                        <div class="portfolio_box">
+                                            <img src="{{ p.image_url or url_for('static', filename='images/portfolio.jpeg') }}" alt="{{ p.title }}" height="230">
+                                            <div class="portfolio_layer">
+                                                    <h4>{{ p.title }}</h4>
+                                                    <p>{{ p.description }}</p>
+                                                    {% if p.github_url %}
+                                                        <a href="{{ p.github_url }}" target="_blank" rel="noopener"><i class='fab fa-github '></i></a>
+                                                    {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
            </section>
 {% endblock %}

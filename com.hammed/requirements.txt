@@ -11,3 +11,5 @@ Flask-Limiter
 Flask-Login==0.6.3
 Flask-Mail
 python-dotenv
+email-validator
+supabase
