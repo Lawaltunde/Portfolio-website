@@ -434,7 +434,7 @@ nav .nav-container ul li a.nav-active{
 	display: flex;
 }
 .portfolio_box img{
-.flash-container { max-width: 1100px; margin: 80px auto 0; padding: 0 1rem; }
+.flash-container { position: fixed; top: 100px; left: 50%; transform: translateX(-50%); max-width: 1100px; margin: 0 auto; padding: 0 1rem; z-index: 1000; }
 .flash { padding: 10px 14px; border-radius: 6px; margin-bottom: 10px; color: #111; background: #ffe58f; border: 1px solid #faad14; }
 .flash.success { background:#b7eb8f; border-color:#52c41a; }
 .flash.danger { background:#ffa39e; border-color:#ff4d4f; }

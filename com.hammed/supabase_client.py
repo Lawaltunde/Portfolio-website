@@ -2,16 +2,16 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 import logging
 
 # Load environment variables
-dotenv_path = Path('./.env')
+dotenv_path = Path(__file__).resolve().parent.parent / '.env'
 load_dotenv(dotenv_path=dotenv_path)
 
 # Supabase client
-url: str = os.environ.get("SUPABASE_URL")
-key: str = os.environ.get("SUPABASE_KEY")
+url: Optional[str] = os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
+key: Optional[str] = os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 supabase: Union[Client, None] = None
 if url and key:
     try:

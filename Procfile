@@ -1,0 +1,1 @@
+web: gunicorn com.hammed.app:app
