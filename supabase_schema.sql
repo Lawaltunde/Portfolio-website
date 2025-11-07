@@ -3,25 +3,15 @@ create table if not exists public.projects (
   id bigserial primary key,
   title text not null,
   description text not null,
-  github_url text,
-  image_url text,
-  tech_stack text,
-  created_at timestamptz default now(),
-  created_by uuid default auth.uid()
-);
-
--- Blogs table
-create table if not exists public.blog_posts (
-  id bigserial primary key,
-  title text not null,
-  content text not null,
+  github_url text default ''::text,
+  image_url text default ''::text,
+  tech_stack text not null,
   created_at timestamptz default now(),
   created_by uuid default auth.uid()
 );
 
 -- Enable RLS
 alter table public.projects enable row level security;
-alter table public.blog_posts enable row level security;
 
 -- Admin governance via an explicit admins table (no service role in app, pure RLS by user id)
 create table if not exists public.admins (
@@ -69,23 +59,6 @@ begin
   if not exists (
     select 1 from pg_policies
     where schemaname = 'public'
-      and tablename  = 'blog_posts'
-      and policyname = 'blog_admin_all'
-  ) then
-    create policy blog_admin_all
-      on public.blog_posts
-      for all
-      using (exists (select 1 from public.admins a where a.user_id = auth.uid()))
-      with check (exists (select 1 from public.admins a where a.user_id = auth.uid()));
-  end if;
-end $$;
-
--- Public read policy
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public'
       and tablename  = 'projects'
       and policyname = 'projects_read_all'
   ) then
@@ -94,29 +67,24 @@ begin
   end if;
 end $$;
 
-do $$
-begin
-  if not exists (
-    select 1 from pg_policies
-    where schemaname = 'public'
-      and tablename  = 'blog_posts'
-      and policyname = 'blog_read_all'
-  ) then
-    create policy blog_read_all
-      on public.blog_posts for select using (true);
-  end if;
-end $$;
+-- Allow authenticated users to insert their own projects.
+create policy projects_owner_insert on public.projects
+  for insert to authenticated
+  with check (auth.uid() = created_by);
 
--- Optional: owner-based writes for non-admins (keep disabled by default)
--- create policy projects_owner_write on public.projects for insert to authenticated using (true) with check (auth.uid() = created_by);
--- create policy blog_owner_write on public.blog_posts for insert to authenticated using (true) with check (auth.uid() = created_by);
+-- Allow authenticated users to update their own projects.
+create policy projects_owner_update on public.projects
+  for update to authenticated
+  using (auth.uid() = created_by);
+
+-- Allow authenticated users to delete their own projects.
+create policy projects_owner_delete on public.projects
+  for delete to authenticated
+  using (auth.uid() = created_by);
 
 -- Storage: buckets (idempotent)
 do $$ begin
   perform storage.create_bucket('portfolio', public => true);
-exception when others then null; end $$;
-do $$ begin
-  perform storage.create_bucket('blogs', public => true);
 exception when others then null; end $$;
 
 -- Storage policies (admin full, public read)
@@ -143,6 +111,6 @@ begin
       and policyname = 'storage_public_read'
   ) then
     create policy storage_public_read on storage.objects for select
-      using (bucket_id in ('portfolio','blogs'));
+      using (bucket_id = 'portfolio');
   end if;
 end $$;
