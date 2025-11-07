@@ -1,10 +1,9 @@
 import os
 from flask import Blueprint, request, redirect, flash, render_template, session
 from flask_login import login_user, logout_user, login_required
-from . import supabase, db
-from .supabase_repo import get_supabase_context_from_env
-from .models import User
-from .supabase_repo import get_backend_mode
+from supabase_client import supabase
+from models import db, User
+from supabase_repo import get_supabase_context_from_env, get_backend_mode
 
 auth_bp = Blueprint('auth', __name__)
 

@@ -8,7 +8,7 @@ if str(ROOT) not in sys.path:
 # Load the app and alias package via WSGI loader
 import wsgi  # noqa: F401
 
-import com_hammed.migrate_to_supabase as mig  # type: ignore[attr-defined]
+from hammed import migrate_to_supabase as mig
 
 if __name__ == "__main__":
     raise SystemExit(mig.main())

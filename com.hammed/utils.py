@@ -2,7 +2,7 @@
 import os
 from flask import render_template
 from flask_mail import Mail, Message as MailMessage
-from .models import Message
+from models import Message, db
 from email_validator import validate_email as _validate_email, EmailNotValidError
 import logging
 
@@ -52,8 +52,7 @@ def storing_database(data: dict) -> None:
         message=cleaned['text'],
     )
 
-    # Lazy import to avoid circular import at module load time
-    from com_hammed import db
+
     try:
         db.session.add(new_message)
         db.session.commit()

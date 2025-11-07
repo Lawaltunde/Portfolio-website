@@ -1,9 +1,12 @@
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-try:
-    from com_hammed import db  # when loaded via wsgi alias
-except Exception:
-    from . import db  # fallback when package imported normally
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin
+
+db = SQLAlchemy()
+login_manager = LoginManager()
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
