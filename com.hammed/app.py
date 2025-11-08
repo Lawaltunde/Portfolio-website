@@ -29,12 +29,15 @@ def create_app():
     app = Flask(__name__)
 
     logging.basicConfig(level=logging.INFO)
+    logging.info("Starting to create the Flask app.")
 
     # Configurations
     is_production = os.environ.get('FLASK_ENV') == 'production'
     secret_key = os.environ.get('SECRET_KEY')
+    logging.info("Loaded basic environment variables.")
 
     if is_production and not secret_key:
+        logging.error("SECRET_KEY is not set in production.")
         raise ValueError("SECRET_KEY must be set in the environment for production.")
 
     app.config['SECRET_KEY'] = secret_key or 'a-temporary-dev-secret-key'
@@ -44,21 +47,36 @@ def create_app():
     app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
+    logging.info("Mail configuration loaded.")
 
     # Initialize extensions with the app object
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    logging.info("LoginManager initialized.")
     csrf.init_app(app)
+    logging.info("CSRFProtect initialized.")
     limiter.init_app(app)
+    logging.info("Limiter initialized.")
     mail.init_app(app)
+    logging.info("Mail initialized.")
 
-    from supabase_client import supabase
-    app.supabase = supabase
+    try:
+        from supabase_client import supabase
+        app.supabase = supabase
+        if supabase:
+            logging.info("Supabase client imported and attached to app successfully.")
+        else:
+            logging.warning("Supabase client is None after import.")
+    except Exception as e:
+        logging.error(f"Failed to import or attach Supabase client: {e}")
+        raise
 
     # Register blueprints
     app.register_blueprint(routes.bp)
     app.register_blueprint(auth.auth_bp)
+    logging.info("Blueprints registered.")
 
+    logging.info("Flask app creation complete.")
     return app
 
 if __name__ == "__main__":
