@@ -69,22 +69,12 @@ def create_app():
     from portfolio import errors
 
     # Logging
-    if os.environ.get('FLASK_ENV') == 'production':
-        # In production, log to stdout
-        stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-        stream_handler.setLevel(logging.INFO)
-        app.logger.addHandler(stream_handler)
-    else:
-        # In development, log to a file
-        if not os.path.exists('logs'):
-            os.mkdir('logs')
-        file_handler = RotatingFileHandler('logs/portfolio.log', maxBytes=10240, backupCount=10)
-        file_handler.setFormatter(logging.Formatter(
-            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-        file_handler.setLevel(logging.INFO)
-        app.logger.addHandler(file_handler)
+    # In production, log to stdout
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+    stream_handler.setLevel(logging.INFO)
+    app.logger.addHandler(stream_handler)
 
     app.logger.setLevel(logging.INFO)
     app.logger.info('Portfolio startup')
