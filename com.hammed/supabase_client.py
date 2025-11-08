@@ -5,13 +5,8 @@ from pathlib import Path
 from typing import Union, Optional
 import logging
 
-# Load environment variables
-dotenv_path = Path(__file__).resolve().parent.parent / '.env'
-load_dotenv(dotenv_path=dotenv_path)
-
-# Supabase client
-url: Optional[str] = os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
-key: Optional[str] = os.environ.get("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+url: Optional[str] = os.environ.get("SUPABASE_URL")
+key: Optional[str] = os.environ.get("SUPABASE_KEY")
 supabase: Union[Client, None] = None
 if url and key:
     try:
