@@ -64,7 +64,14 @@ def create_app():
     from portfolio import errors
 
     # Logging
-    if not app.debug:
+    if is_production:
+        # In production, log to stdout, which Vercel captures
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        stream_handler.setLevel(logging.INFO)
+        app.logger.addHandler(stream_handler)
+    elif not app.debug:
         if not os.path.exists('logs'):
             os.mkdir('logs')
         file_handler = RotatingFileHandler('logs/portfolio.log', maxBytes=10240, backupCount=10)
@@ -73,8 +80,8 @@ def create_app():
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
 
-        app.logger.setLevel(logging.INFO)
-        app.logger.info('Portfolio startup')
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Portfolio startup')
 
     return app
 
