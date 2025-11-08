@@ -214,11 +214,12 @@ def admin_blogs():
             return redirect(url_for('routes.admin_blogs'))
         if ctx is not None:
             ok = BlogRepo(ctx).create_post(title.strip(), content.strip()) is not None
-            if not ok:
+            if ok:
+                flash('Blog post created', 'success')
+            else:
                 flash('Failed to create blog post in Supabase', 'danger')
         else:
             flash('Supabase is not configured; cannot create blog post in supabase mode.', 'danger')
-        flash('Blog post created', 'success')
         return redirect(url_for('routes.admin_blogs'))
 
     posts = BlogRepo(ctx).list_posts() if ctx is not None else []
@@ -233,11 +234,12 @@ def delete_blog(post_id: int):
     ctx = get_supabase_context_from_env()
     if ctx is not None:
         ok = BlogRepo(ctx).delete_post(post_id)
-        if not ok:
+        if ok:
+            flash('Blog post deleted', 'success')
+        else:
             flash('Failed to delete blog post in Supabase', 'danger')
     else:
         flash('Supabase is not configured; cannot delete blog post in supabase mode.', 'danger')
-    flash('Blog post deleted', 'success')
     next_url = request.args.get('next') or request.form.get('next')
     if next_url and isinstance(next_url, str) and next_url.startswith('/'):
         return redirect(next_url)

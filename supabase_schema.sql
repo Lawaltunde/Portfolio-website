@@ -68,19 +68,37 @@ begin
 end $$;
 
 -- Allow authenticated users to insert their own projects.
-create policy projects_owner_insert on public.projects
-  for insert to authenticated
-  with check (auth.uid() = created_by);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'projects_owner_insert' AND polrelid = 'public.projects'::regclass) THEN
+    CREATE POLICY projects_owner_insert ON public.projects
+      FOR INSERT TO authenticated
+      WITH CHECK (auth.uid() = created_by);
+  END IF;
+END;
+$$;
 
 -- Allow authenticated users to update their own projects.
-create policy projects_owner_update on public.projects
-  for update to authenticated
-  using (auth.uid() = created_by);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'projects_owner_update' AND polrelid = 'public.projects'::regclass) THEN
+    CREATE POLICY projects_owner_update ON public.projects
+      FOR UPDATE TO authenticated
+      USING (auth.uid() = created_by);
+  END IF;
+END;
+$$;
 
 -- Allow authenticated users to delete their own projects.
-create policy projects_owner_delete on public.projects
-  for delete to authenticated
-  using (auth.uid() = created_by);
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'projects_owner_delete' AND polrelid = 'public.projects'::regclass) THEN
+    CREATE POLICY projects_owner_delete ON public.projects
+      FOR DELETE TO authenticated
+      USING (auth.uid() = created_by);
+  END IF;
+END;
+$$;
 
 -- Storage: buckets (idempotent)
 do $$ begin

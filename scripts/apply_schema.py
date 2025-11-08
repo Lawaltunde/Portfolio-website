@@ -1,5 +1,5 @@
-
 import os
+import sqlparse
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from pathlib import Path
@@ -13,7 +13,7 @@ def main():
     service_role_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
 
     if not url or not service_role_key:
-        print("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in the .env file.")
+        print("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set in the .env file.")
         return
 
     supabase: Client = create_client(url, service_role_key)
@@ -21,7 +21,10 @@ def main():
     # Read the schema.sql file
     schema_path = Path(__file__).parent.parent / 'supabase_schema.sql'
     with open(schema_path, 'r') as f:
-        sql_commands = f.read().split(';')
+        sql_script = f.read()
+    
+    sql_commands = sqlparse.split(sql_script)
+
 
     # Execute the schema
     for command in sql_commands:
