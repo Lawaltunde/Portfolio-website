@@ -28,9 +28,7 @@ def create_app():
     app = Flask(__name__)
 
     # Configurations
-    is_production = os.environ.get('FLASK_ENV') == 'production'
     secret_key = os.environ.get('SECRET_KEY')
-
     if not secret_key:
         raise ValueError("SECRET_KEY must be set in the environment.")
 
@@ -44,9 +42,13 @@ def create_app():
 
     # Database configuration
     database_url = os.environ.get('DATABASE_URL')
-    if os.environ.get('VERCEL') == '1' and not database_url:
-        raise ValueError("DATABASE_URL must be set for production in Vercel.")
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///../instance/portfolio.db'
+    if database_url:
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # For development, use an absolute path to a local SQLite database.
+        db_path = os.path.join(app.instance_path, 'portfolio.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+        
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions with the app object
@@ -67,14 +69,15 @@ def create_app():
     from portfolio import errors
 
     # Logging
-    if is_production:
-        # In production, log to stdout, which Vercel captures
+    if os.environ.get('FLASK_ENV') == 'production':
+        # In production, log to stdout
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
         stream_handler.setLevel(logging.INFO)
         app.logger.addHandler(stream_handler)
-    elif not app.debug:
+    else:
+        # In development, log to a file
         if not os.path.exists('logs'):
             os.mkdir('logs')
         file_handler = RotatingFileHandler('logs/portfolio.log', maxBytes=10240, backupCount=10)
