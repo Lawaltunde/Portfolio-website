@@ -28,10 +28,7 @@ limiter = Limiter(
 def create_app():
     app = Flask(__name__)
 
-    # Load environment variables
     logging.basicConfig(level=logging.INFO)
-    dotenv_path = Path(__file__).parent / '.env'
-    load_dotenv(dotenv_path=dotenv_path)
 
     # Configurations
     is_production = os.environ.get('FLASK_ENV') == 'production'
