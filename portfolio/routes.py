@@ -163,11 +163,23 @@ def html_page(page_name: str):
 def submited_form():
     if request.method == 'POST':
         data = request.form.to_dict()
+        
+        # Get mail recipient from environment variables
+        mail_recipient = os.environ.get('MAIL_RECIPIENT')
+        
+        # If the recipient is not configured, log an error and return
+        if not mail_recipient:
+            logging.critical("MAIL_RECIPIENT environment variable is not set. Cannot send email.")
+            # Flash a message to the user
+            flash('The email service is currently unavailable. Please try again later.', 'danger')
+            # Redirect back to the contact page
+            return redirect(url_for('routes.html_page', page_name='contact.html'))
+
         try:
             # Send email notification using the new template
             send_email(
                 subject=f"New Inquiry from {data.get('user_name', 'a visitor')}: {data.get('subject', '')}",
-                recipients=[os.environ.get('MAIL_RECIPIENT')],
+                recipients=[mail_recipient],
                 template='email_template.html',
                 name=data.get('user_name'),
                 email=data.get('email'),
