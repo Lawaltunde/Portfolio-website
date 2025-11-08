@@ -68,7 +68,7 @@ To run this project locally, follow these steps:
 ## ☁️ Deploying to Render or Vercel
 
 - Render (recommended for Flask):
-    - Build command: `pip install -r com.hammed/requirements.txt`
+    - Build command: `pip install -r requirements.txt`
     - Start command: `gunicorn --chdir . wsgi:app`
     - Environment: `DATA_BACKEND=supabase`, plus Supabase envs and `SECRET_KEY`.
 - Vercel:
@@ -77,10 +77,10 @@ To run this project locally, follow these steps:
 
 In production, the app will not fallback to SQLite when `DATA_BACKEND=supabase` is set—writes will fail fast if Supabase is unavailable.
 
-## �📂 File Structure
+## 📂 File Structure
 
 ```
-hammedA00276443FinalProject/
+portfolio/
 ├── app.py                  # Main Flask application
 ├── requirements.txt        # Python dependencies
 ├── static/

@@ -1,1 +1,1 @@
-web: gunicorn com.hammed.app:app
+web: gunicorn portfolio.app:app

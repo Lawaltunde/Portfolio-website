@@ -1,6 +1,9 @@
 import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
+
 from pathlib import Path
 from typing import Union, Optional
 import logging

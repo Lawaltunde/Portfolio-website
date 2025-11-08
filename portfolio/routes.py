@@ -2,12 +2,12 @@ import logging
 from flask import Blueprint, render_template, request, redirect, abort, flash, url_for, current_app
 from flask_login import login_required, current_user
 from flask_limiter import Limiter
-from utils import send_email
+from .utils import send_email
 from flask import session
 import os
 from pathlib import Path
 from werkzeug.utils import secure_filename
-from supabase_repo import get_supabase_context_from_env, ProjectRepo, BlogRepo, get_backend_mode
+from .supabase_repo import get_supabase_context_from_env, ProjectRepo, BlogRepo, get_backend_mode
 
 bp = Blueprint('routes', __name__)
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ def admin_projects():
         uploaded = request.files.get('image_file')
         if not session.get('supabase_token'):
             flash('Admin token missing. Please log out and log in again to continue.', 'warning')
-            return redirect(url_for('routes.admin_projects'))
+            return redirect(url_for('auth.login'))
         if uploaded and uploaded.filename and ctx is not None:
             filename = secure_filename(uploaded.filename)
             image_public_url = ProjectRepo(ctx).upload_image(
@@ -167,7 +167,7 @@ def submited_form():
             # Send email notification using the new template
             send_email(
                 subject=f"New Inquiry from {data.get('user_name', 'a visitor')}: {data.get('subject', '')}",
-                recipients=[os.environ.get('MAIL_DEFAULT_SENDER')],
+                recipients=[os.environ.get('MAIL_RECIPIENT')],
                 template='email_template.html',
                 name=data.get('user_name'),
                 email=data.get('email'),
@@ -211,7 +211,7 @@ def admin_blogs():
             return redirect(url_for('routes.admin_blogs'))
         if not session.get('supabase_token'):
             flash('Admin token missing. Please log out and log in again to continue.', 'warning')
-            return redirect(url_for('routes.admin_blogs'))
+            return redirect(url_for('auth.login'))
         if ctx is not None:
             ok = BlogRepo(ctx).create_post(title.strip(), content.strip()) is not None
             if ok:

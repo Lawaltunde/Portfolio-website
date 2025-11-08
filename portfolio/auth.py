@@ -1,8 +1,9 @@
 from flask import Blueprint, request, redirect, flash, render_template, session
 from flask_login import login_user, logout_user, login_required
-from supabase_client import supabase
-from models import User
-from supabase_repo import get_supabase_context_from_env, get_backend_mode
+import logging
+from .supabase_client import supabase
+from .models import User
+from .supabase_repo import get_supabase_context_from_env, get_backend_mode
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -10,18 +11,24 @@ auth_bp = Blueprint('auth', __name__)
 def login():
     """Supabase-only login; permit only admins to proceed to the app."""
     if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        logging.info(f"Login attempt for email: {email}")
         try:
             if get_backend_mode() == 'supabase' and supabase is None:
+                logging.error("Supabase is not configured")
                 raise RuntimeError("Supabase is not configured")
-            email = request.form.get('email')
-            password = request.form.get('password')
+
             sres = supabase.auth.sign_in_with_password({
                 "email": email,
                 "password": password
             })
+            logging.info(f"Supabase sign-in successful for email: {email}")
+
             try:
                 session["supabase_token"] = sres.session.access_token
-            except Exception:
+            except Exception as e:
+                logging.warning(f"Could not set supabase_token in session for {email}: {e}")
                 session.pop("supabase_token", None)
 
             is_admin = False
@@ -31,18 +38,25 @@ def login():
                 if client is not None:
                     admin_check = client.table('admins').select('user_id').eq('user_id', sres.user.id).single().execute()
                     is_admin = bool(admin_check.data)
-            except Exception:
+                    logging.info(f"Admin check for {email}: {is_admin}")
+                else:
+                    logging.warning(f"Could not get user client for {email}")
+            except Exception as e:
+                logging.error(f"Error during admin check for {email}: {e}")
                 is_admin = False
 
             if not is_admin:
                 flash('You are not authorized to access admin.', 'danger')
+                logging.warning(f"Unauthorized login attempt for {email}")
                 return render_template('login.html')
 
             user = User(id=sres.user.id, username=email, role='admin')
             session['user_details'] = {'id': user.id, 'username': user.username, 'role': user.role}
             login_user(user)
+            logging.info(f"User {email} logged in successfully as admin.")
             return redirect('/admin')
-        except Exception:
+        except Exception as e:
+            logging.error(f"Login failed for {email}: {e}")
             flash('Invalid email or password', 'danger')
     return render_template('login.html')
 

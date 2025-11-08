@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 
 # Redirect stdout and stderr to the logging module
 class StreamToLogger:
@@ -27,7 +28,12 @@ sys.stderr = StreamToLogger(logger, logging.ERROR)
 
 logger.info("WSGI script started.")
 try:
-    from com.hammed.app import create_app
+    # Add the project's root directory to the Python path to ensure imports work correctly
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__))))
+
+    from portfolio.app import create_app
+
+    # Create the Flask app
     logger.info("Successfully imported create_app.")
     app = create_app()
     logger.info("Successfully created app.")
