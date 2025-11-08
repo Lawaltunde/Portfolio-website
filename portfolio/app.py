@@ -43,7 +43,10 @@ def create_app():
     app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
     # Database configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///../instance/portfolio.db')
+    database_url = os.environ.get('DATABASE_URL')
+    if os.environ.get('VERCEL') == '1' and not database_url:
+        raise ValueError("DATABASE_URL must be set for production in Vercel.")
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///../instance/portfolio.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     # Initialize extensions with the app object
