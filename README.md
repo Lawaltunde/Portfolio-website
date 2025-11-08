@@ -2,12 +2,12 @@
 
 Welcome to the repository for my personal portfolio website! This site is a living showcase of my journey in software engineering and data analysis, featuring projects I've built, skills I've honed, and a little bit about who I am.
 
-## 🚀 Features
+## 🚀 Live Demo
 
-*   **Home Page**: A welcoming introduction with a brief summary of my skills and passion.
-*   **About Page**: A deeper dive into my background, professional experience, and the technologies I work with.
-*   **Contact Page**: A functional contact form that allows visitors to get in touch with me directly.
-*   **Responsive Design**: The website is fully responsive, providing an optimal viewing experience across desktops, tablets, and mobile devices.
+You can view the live version of this project hosted on Render:
+
+[https://portfolio-website-2-ynxl.onrender.com/](https://portfolio-website-2-ynxl.onrender.com/)
+
 ## 🛠️ Tech Stack
 
 <p align="left">
@@ -65,17 +65,24 @@ To run this project locally, follow these steps:
 - SUPABASE_URL, SUPABASE_KEY (or NEXT_PUBLIC_* fallbacks): Required for Supabase mode.
 - SUPABASE_SERVICE_ROLE_KEY: Optional; used only for one-off migrations via `migrate_to_supabase.py`.
 
-## ☁️ Deploying to Render or Vercel
+## ☁️ Deploying to Render
 
-- Render (recommended for Flask):
-    - Build command: `pip install -r requirements.txt`
-    - Start command: `gunicorn --chdir . wsgi:app`
-    - Environment: `DATA_BACKEND=supabase`, plus Supabase envs and `SECRET_KEY`.
-- Vercel:
-    - Use Vercel’s Python/Flask template or `vercel-python-wsgi`. Configure `wsgi.py` as the entry point.
-    - Set the same environment variables as above.
+This project is configured for easy deployment to Render.
 
-In production, the app will not fallback to SQLite when `DATA_BACKEND=supabase` is set—writes will fail fast if Supabase is unavailable.
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `gunicorn app:app`
+
+Set the following environment variables in your Render service configuration:
+- `SECRET_KEY`
+- `DATABASE_URL` (for your production database)
+- `MAIL_SERVER`
+- `MAIL_PORT`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `MAIL_RECIPIENT`
+- `SUPABASE_URL`
+- `SUPABASE_KEY`
+- `FLASK_ENV=production`
 
 ## 📂 File Structure
 

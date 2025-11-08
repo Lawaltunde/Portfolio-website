@@ -70,11 +70,12 @@ def create_app():
 
     # Logging
     # In production, log to stdout
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    stream_handler.setLevel(logging.INFO)
-    app.logger.addHandler(stream_handler)
+    if not any(isinstance(h, logging.StreamHandler) for h in app.logger.handlers):
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+        stream_handler.setLevel(logging.INFO)
+        app.logger.addHandler(stream_handler)
 
     app.logger.setLevel(logging.INFO)
     app.logger.info('Portfolio startup')
